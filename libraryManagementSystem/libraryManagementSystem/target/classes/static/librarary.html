@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Management System</title>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+
+    .navbar {
+        background: rgba(0, 0, 0, 0.9);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .navbar h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .nav-links {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+    }
+
+    .nav-links a {
+        color: white;
+        text-decoration: none;
+        transition: color 0.3s;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .nav-links a:hover {
+        color: #667eea;
+    }
+
+    .nav-right {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: #fff;
+    }
+
+    .user-role {
+        background: #667eea;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .logout-btn {
+        background: #e74c3c;
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        color: white;
+        cursor: pointer;
+        transition: background 0.3s;
+        font-weight: 500;
+    }
+
+    .logout-btn:hover {
+        background: #c0392b;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+    }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+        border-left: 5px solid #667eea;
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .card h3 {
+        color: #333;
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+    }
+
+    .card p {
+        color: #666;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    .card-icon {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .btn-primary {
+        background: #667eea;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .btn-primary:hover {
+        background: #5568d3;
+    }
+
+    .btn-secondary {
+        background: #95a5a6;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .btn-secondary:hover {
+        background: #7f8c8d;
+    }
+
+    .main-content {
+        display: none;
+        animation: fadeIn 0.3s ease-in;
+    }
+
+    .main-content.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .form-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        max-width: 700px;
+        margin: 2rem auto;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.6rem;
+        color: #333;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.85rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-family: inherit;
+        transition: border-color 0.3s;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin: 2rem 0;
+        overflow-x: auto;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        background: #667eea;
+        color: white;
+        padding: 1.2rem;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 3px solid #5568d3;
+    }
+
+    td {
+        padding: 1rem 1.2rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    tr:hover {
+        background: #f8f9fa;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-edit, .btn-delete, .btn-view {
+        padding: 0.6rem 1rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-edit {
+        background: #3498db;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #2980b9;
+    }
+
+    .btn-delete {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #c0392b;
+    }
+
+    .btn-view {
+        background: #2ecc71;
+        color: white;
+    }
+
+    .btn-view:hover {
+        background: #27ae60;
+    }
+
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    .modal.active {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: modalFadeIn 0.3s ease-in;
+    }
+
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    .modal-content {
+        background-color: white;
+        padding: 2.5rem;
+        border-radius: 12px;
+        max-width: 650px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 1rem;
+    }
+
+    .modal-header h2 {
+        color: #333;
+        font-size: 1.5rem;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 2rem;
+        cursor: pointer;
+        color: #999;
+        transition: color 0.3s;
+    }
+
+    .close-btn:hover {
+        color: #333;
+    }
+
+    .alert {
+        padding: 1.2rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        border-left: 5px solid;
+        animation: slideDown 0.3s ease-in;
+    }
+
+    @keyframes slideDown {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border-color: #c3e6cb;
+    }
+
+    .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border-color: #f5c6cb;
+    }
+
+    .alert-info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border-color: #bee5eb;
+    }
+
+    .status-badge {
+        padding: 0.4rem 0.9rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-completed {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-inactive {
+        background: #e2e3e5;
+        color: #383d41;
+    }
+
+    .status-suspended {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .search-bar {
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .search-bar input {
+        flex: 1;
+        min-width: 200px;
+        padding: 0.85rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+
+    .search-bar input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .pagination button {
+        padding: 0.6rem 1rem;
+        border: 2px solid #ddd;
+        background: white;
+        cursor: pointer;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .pagination button:hover {
+        border-color: #667eea;
+    }
+
+    .pagination button.active {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .login-form {
+        background: white;
+        padding: 3rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 450px;
+    }
+
+    .login-form h2 {
+        margin-bottom: 0.5rem;
+        color: #333;
+        text-align: center;
+        font-size: 2rem;
+    }
+
+    .login-form p {
+        text-align: center;
+        color: #666;
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        color: #333;
+        margin-bottom: 2rem;
+        font-size: 2rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .section-header {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .loading {
+        text-align: center;
+        padding: 3rem;
+        color: #667eea;
+    }
+
+    .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .no-data {
+        text-align: center;
+        padding: 3rem;
+        color: #999;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .nav-links {
+            display: none;
+        }
+
+        .dashboard {
+            grid-template-columns: 1fr;
+        }
+
+        .table-container {
+            padding: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .action-buttons button {
+            width: 100%;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .modal-content {
+            padding: 1.5rem;
+        }
+    }
+  </style>
+</head>
+<body>
+<!-- Login Page -->
+<div id="loginPage" class="login-container">
+  <div class="login-form">
+    <h2>📚 Library</h2>
+    <p>Management System</p>
+    <div id="loginError" class="alert alert-error" style="display: none;"></div>
+    <form id="loginForm">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="loginUsername" placeholder="Enter username" required>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter password" required>
+      </div>
+      <button type="submit" class="btn-primary" style="width: 100%; padding: 1rem;">Login</button>
+    </form>
+  </div>
+</div>
+
+<!-- Main Application -->
+<div id="mainApp" style="display: none;">
+  <!-- Navbar -->
+  <nav class="navbar">
+    <h1>📚 Library Management System</h1>
+    <ul class="nav-links">
+      <li><a onclick="showDashboard()">Dashboard</a></li>
+      <li><a onclick="showSection('users')" id="usersLink" style="display:none;">Users</a></li>
+      <li><a onclick="showSection('memberships')">Memberships</a></li>
+      <li><a onclick="showSection('events')">Events</a></li>
+      <li><a onclick="showSection('maintenance')">Maintenance</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="user-info">
+        <span id="userDisplay"></span>
+        <span class="user-role" id="userRole"></span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Dashboard -->
+    <div id="dashboard" class="main-content active">
+      <h2 class="page-title">📊 Dashboard</h2>
+      <div class="dashboard">
+        <div class="card" id="usersCard" style="display:none;" onclick="showSection('users')">
+          <div class="card-icon">👥</div>
+          <h3>Users Management</h3>
+          <p>Manage system users and roles</p>
+          <button class="btn-primary">Manage Users</button>
+        </div>
+        <div class="card" onclick="showSection('memberships')">
+          <div class="card-icon">💳</div>
+          <h3>Memberships</h3>
+          <p>Manage member accounts and subscriptions</p>
+          <button class="btn-primary">Manage Memberships</button>
+        </div>
+        <div class="card" onclick="showSection('events')">
+          <div class="card-icon">📅</div>
+          <h3>Events</h3>
+          <p>Library events and activities</p>
+          <button class="btn-primary">Manage Events</button>
+        </div>
+        <div class="card" onclick="showSection('maintenance')">
+          <div class="card-icon">🔧</div>
+          <h3>Maintenance</h3>
+          <p>Access logs, reports, transactions</p>
+          <button class="btn-primary">Manage Maintenance</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Section (ADMIN ONLY) -->
+    <div id="users" class="main-content">
+      <div class="section-header">
+        <h2 class="page-title">👥 Users Management</h2>
+        <button class="btn-primary" onclick="showUserModal()">+ Add User</button>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="userSearch" placeholder="Search users by username...">
+      </div>
+      <div id="usersTable" class="table-container"></div>
+      <div id="usersPagination" class="pagination"></div>
+    </div>
+
+    <!-- User Modal -->
+    <div id="userModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="userModalTitle">Add User</h2>
+          <button class="close-btn" onclick="closeUserModal()">&times;</button>
+        </div>
+        <form id="userForm">
+          <div class="form-group">
+            <label>Username *</label>
+            <input type="text" id="userUsername" required>
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" id="userEmail" required>
+          </div>
+          <div class="form-group">
+            <label>Password *</label>
+            <input type="password" id="userPassword" required>
+          </div>
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="userFirstName">
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="userLastName">
+          </div>
+          <div class="form-group">
+            <label>Role *</label>
+            <select id="userRole" required>
+              <option value="">Select Role</option>
+              <option value="ADMIN">Admin</option>
+              <option value="USER">User</option>
+              <option value="STAFF">Staff</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="userEnabled" checked> Active User
+            </label>
+          </div>
+          <button type="submit" class="btn-primary">Save User</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Memberships Section -->
+    <div id="memberships" class="main-content">
+      <div class="section-header">
+        <h2 class="page-title">💳 Memberships</h2>
+        <button class="btn-primary" onclick="showMembershipModal()">+ Add Membership</button>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="membershipSearch" placeholder="Search by membership number...">
+      </div>
+      <div id="membershipsTable" class="table-container"></div>
+      <div id="membershipsPagination" class="pagination"></div>
+    </div>
+
+    <!-- Membership Modal -->
+    <div id="membershipModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="membershipModalTitle">Add Membership</h2>
+          <button class="close-btn" onclick="closeMembershipModal()">&times;</button>
+        </div>
+        <form id="membershipForm">
+          <div class="form-group">
+            <label>User ID *</label>
+            <input type="number" id="membershipUserId" required>
+          </div>
+          <div class="form-group">
+            <label>Membership Type *</label>
+            <select id="membershipType" required>
+              <option value="">Select Type</option>
+              <option value="BASIC">Basic</option>
+              <option value="PREMIUM">Premium</option>
+              <option value="GOLD">Gold</option>
+              <option value="PLATINUM">Platinum</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Start Date *</label>
+            <input type="date" id="membershipStartDate" required>
+          </div>
+          <div class="form-group">
+            <label>End Date *</label>
+            <input type="date" id="membershipEndDate" required>
+          </div>
+          <div class="form-group">
+            <label>Fees</label>
+            <input type="number" id="membershipFees" step="0.01" min="0">
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="membershipStatus">
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
+              <option value="SUSPENDED">Suspended</option>
+              <option value="EXPIRED">Expired</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-primary">Save Membership</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Events Section -->
+    <div id="events" class="main-content">
+      <div class="section-header">
+        <h2 class="page-title">📅 Events</h2>
+        <button class="btn-primary" onclick="showEventModal()" id="addEventBtn" style="display:none;">+ Add Event</button>
+      </div>
+      <div class="search-bar">
+        <input type="text" id="eventSearch" placeholder="Search events...">
+      </div>
+      <div id="eventsTable" class="table-container"></div>
+      <div id="eventsPagination" class="pagination"></div>
+    </div>
+
+    <!-- Event Modal -->
+    <div id="eventModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="eventModalTitle">Add Event</h2>
+          <button class="close-btn" onclick="closeEventModal()">&times;</button>
+        </div>
+        <form id="eventForm">
+          <div class="form-group">
+            <label>Title *</label>
+            <input type="text" id="eventTitle" required>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="eventDescription"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Event Date & Time *</label>
+            <input type="datetime-local" id="eventDate" required>
+          </div>
+          <div class="form-group">
+            <label>Type *</label>
+            <select id="eventType" required>
+              <option value="">Select Type</option>
+              <option value="MAINTENANCE">Maintenance</option>
+              <option value="REPORT">Report</option>
+              <option value="TRANSACTION">Transaction</option>
+              <option value="CHART">Chart</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="eventStatus">
+              <option value="PENDING">Pending</option>
+              <option value="ACTIVE">Active</option>
+              <option value="COMPLETED">Completed</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>User ID</label>
+            <input type="number" id="eventUserId">
+          </div>
+          <button type="submit" class="btn-primary">Save Event</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Maintenance Section -->
+    <div id="maintenance" class="main-content">
+      <div class="section-header">
+        <h2 class="page-title">🔧 Maintenance</h2>
+      </div>
+
+      <!-- Access Logs Tab -->
+      <div style="margin-bottom: 2rem; border-bottom: 2px solid #e0e0e0; padding-bottom: 1rem;">
+        <button class="btn-primary" onclick="switchMaintenanceTab('access-logs')" style="margin-right: 1rem;">Access Logs</button>
+        <button class="btn-primary" onclick="switchMaintenanceTab('reports')" style="margin-right: 1rem;">Reports</button>
+        <button class="btn-primary" onclick="switchMaintenanceTab('transactions')">Transactions</button>
+      </div>
+
+      <!-- Access Logs -->
+      <div id="accessLogsTab" class="table-container">
+        <h3 style="margin-bottom: 1rem;">📋 Access Logs</h3>
+        <div id="accessLogsTable"></div>
+      </div>
+
+      <!-- Reports -->
+      <div id="reportsTab" class="table-container" style="display:none;">
+        <h3 style="margin-bottom: 1rem;">📊 Reports</h3>
+        <button class="btn-primary" onclick="showReportModal()" style="margin-bottom: 1rem;">+ Generate Report</button>
+        <div id="reportsTable"></div>
+      </div>
+
+      <!-- Transactions -->
+      <div id="transactionsTab" class="table-container" style="display:none;">
+        <h3 style="margin-bottom: 1rem;">💰 Transactions</h3>
+        <button class="btn-primary" onclick="showTransactionModal()" style="margin-bottom: 1rem;">+ Add Transaction</button>
+        <div id="transactionsTable"></div>
+      </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Generate Report</h2>
+          <button class="close-btn" onclick="closeReportModal()">&times;</button>
+        </div>
+        <form id="reportForm">
+          <div class="form-group">
+            <label>Report Title *</label>
+            <input type="text" id="reportTitle" required>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="reportDescription"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Report Date *</label>
+            <input type="date" id="reportDate" required>
+          </div>
+          <button type="submit" class="btn-primary">Generate Report</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Transaction Modal -->
+    <div id="transactionModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Add Transaction</h2>
+          <button class="close-btn" onclick="closeTransactionModal()">&times;</button>
+        </div>
+        <form id="transactionForm">
+          <div class="form-group">
+            <label>Amount *</label>
+            <input type="number" id="transactionAmount" required step="0.01" min="0">
+          </div>
+          <div class="form-group">
+            <label>Id *</label>
+            <input type="number" id="transactionId" required step="0.01" min="0">
+          </div>
+          <div class="form-group">
+            <label>Type *</label>
+            <select id="transactionType" required>
+              <option value="">Select Type</option>
+              <option value="DEPOSIT">Deposit</option>
+              <option value="WITHDRAWAL">Withdrawal</option>
+              <option value="FINE">Fine</option>
+              <option value="REFUND">Refund</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea id="transactionDescription"></textarea>
+          </div>
+          <button type="submit" class="btn-primary">Save Transaction</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_URL = 'http://localhost:8080';
+  let token = localStorage.getItem('jwtToken');
+  let currentUser = localStorage.getItem('currentUser');
+  let currentRole = localStorage.getItem('userRole');
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', function() {
+      if (token && currentUser) {
+          showMainApp();
+          loadAllData();
+      } else {
+          setupLoginForm();
+      }
+  });
+
+  // ======================== LOGIN ========================
+
+  function setupLoginForm() {
+      document.getElementById('loginForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const username = document.getElementById('loginUsername').value;
+          const password = document.getElementById('loginPassword').value;
+
+          try {
+              const response = await fetch(`${API_URL}/login`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ username, password })
+              });
+
+              if (response.ok) {
+                  const data = await response.json();
+                  token = data.token;
+                  currentUser = data.username;
+                  currentRole = data.roles?.[0] || 'USER';
+
+                  localStorage.setItem('jwtToken', token);
+                  localStorage.setItem('currentUser', currentUser);
+                  localStorage.setItem('userRole', currentRole);
+
+                  showMainApp();
+                  loadAllData();
+              } else {
+                  showError('Invalid credentials', 'loginError');
+              }
+          } catch (error) {
+              showError('Login failed', 'loginError');
+          }
+      });
+  }
+
+  function showMainApp() {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'block';
+      document.getElementById('userDisplay').textContent = `👤 ${currentUser}`;
+      document.getElementById('userRole').textContent = currentRole;
+
+      // Show admin features only for admins
+      if (currentRole === 'ADMIN' || currentRole === 'ROLE_ADMIN') {
+          document.getElementById('usersLink').style.display = 'block';
+          document.getElementById('usersCard').style.display = 'block';
+          document.getElementById('addEventBtn').style.display = 'block';
+      }
+  }
+
+  function logout() {
+      localStorage.clear();
+      location.reload();
+  }
+
+  // ======================== NAVIGATION ========================
+
+  function showDashboard() {
+      document.querySelectorAll('.main-content').forEach(el => el.classList.remove('active'));
+      document.getElementById('dashboard').classList.add('active');
+  }
+
+  function showSection(section) {
+      document.querySelectorAll('.main-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(section).classList.add('active');
+
+      if (section === 'users') loadUsers();
+      else if (section === 'memberships') loadMemberships();
+      else if (section === 'events') loadEvents();
+      else if (section === 'maintenance') {
+          loadAccessLogs();
+          loadReports();
+          loadTransactions();
+      }
+  }
+
+  // ======================== USERS (ADMIN ONLY) ========================
+
+  function showUserModal() {
+      document.getElementById('userForm').reset();
+      document.getElementById('userModalTitle').textContent = 'Add User';
+      document.getElementById('userModal').classList.add('active');
+  }
+
+  function closeUserModal() {
+      document.getElementById('userModal').classList.remove('active');
+  }
+
+  document.getElementById('userForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userData = {
+          username: document.getElementById('userUsername').value,
+          email: document.getElementById('userEmail').value,
+          password: document.getElementById('userPassword').value,
+          firstName: document.getElementById('userFirstName').value,
+          lastName: document.getElementById('userLastName').value,
+          role: document.getElementById('userRole').value,
+          enabled: document.getElementById('userEnabled').checked
+      };
+
+      try {
+          const response = await fetch(`${API_URL}/api/admin/users`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(userData)
+          });
+
+          if (response.ok) {
+              showSuccess('User created successfully');
+              closeUserModal();
+              loadUsers();
+          } else {
+              showError('Failed to create user');
+          }
+      } catch (error) {
+          showError('Error: ' + error.message);
+      }
+  });
+
+  async function loadUsers(page = 0) {
+      try {
+          const response = await fetch(`${API_URL}/api/admin/users`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          if (response.ok) {
+              const data = await response.json();
+              displayUsers(data.data || data);
+          } else {
+              showError('Failed to load users');
+          }
+      } catch (error) {
+          showError('Error: ' + error.message);
+      }
+  }
+
+  function displayUsers(users) {
+      if (!users || users.length === 0) {
+          document.getElementById('usersTable').innerHTML = '<div class="no-data">No users found</div>';
+          return;
+      }
+
+      let html = `<table><thead><tr>
+          <th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th>
+      </tr></thead><tbody>`;
+
+      users.forEach(user => {
+          html += `<tr>
+              <td>${user.id}</td>
+              <td>${user.username}</td>
+              <td>${user.email}</td>
+              <td><strong>${user.role}</strong></td>
+              <td><span class="status-badge ${user.enabled ? 'status-active' : 'status-inactive'}">${user.enabled ? 'Active' : 'Inactive'}</span></td>
+              <td><div class="action-buttons">
+                  <button class="btn-edit">Edit</button>
+                  <button class="btn-delete" onclick="deleteUser(${user.id})">Delete</button>
+              </div></td>
+          </tr>`;
+      });
+
+      html += `</tbody></table>`;
+      document.getElementById('usersTable').innerHTML = html;
+  }
+
+  async function deleteUser(userId) {
+      if (confirm('Are you sure you want to delete this user?')) {
+          try {
+              const response = await fetch(`${API_URL}/api/admin/users/${userId}`, {
+                  method: 'DELETE',
+                  headers: { 'Authorization': `Bearer ${token}` }
+              });
+
+              if (response.ok) {
+                  showSuccess('User deleted successfully');
+                  loadUsers();
+              } else {
+                  showError('Failed to delete user');
+              }
+          } catch (error) {
+              showError('Error: ' + error.message);
+          }
+      }
+  }
+
+  // ======================== MEMBERSHIPS ========================
+
+  function showMembershipModal() {
+      document.getElementById('membershipForm').reset();
+      document.getElementById('membershipModalTitle').textContent = 'Add Membership';
+      document.getElementById('membershipModal').classList.add('active');
+  }
+
+  function closeMembershipModal() {
+      document.getElementById('membershipModal').classList.remove('active');
+  }
+
+  document.getElementById('membershipForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const membershipData = {
+          userId: parseInt(document.getElementById('membershipUserId').value),
+          membershipType: document.getElementById('membershipType').value,
+          startDate: document.getElementById('membershipStartDate').value,
+          endDate: document.getElementById('membershipEndDate').value,
+          fees: parseFloat(document.getElementById('membershipFees').value) || 0,
+          status: document.getElementById('membershipStatus').value
+      };
+
+      try {
+          const response = await fetch(`${API_URL}/api/membership`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(membershipData)
+          });
+
+          if (response.ok) {
+              showSuccess('Membership added successfully');
+              closeMembershipModal();
+              loadMemberships();
+          } else {
+              showError('Failed to add membership');
+          }
+      } catch (error) {
+          showError('Error: ' + error.message);
+      }
+  });
+
+  async function loadMemberships(page = 0) {
+      try {
+          const response = await fetch(`${API_URL}/api/membership`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          if (response.ok) {
+              const data = await response.json();
+              displayMemberships(data.data || data);
+          } else {
+              showError('Failed to load memberships');
+          }
+      } catch (error) {
+          showError('Error: ' + error.message);
+      }
+  }
+
+  function displayMemberships(memberships) {
+      if (!memberships || memberships.length === 0) {
+          document.getElementById('membershipsTable').innerHTML = '<div class="no-data">No memberships found</div>';
+          return;
+      }
+
+      let html = `<table><thead><tr>
+          <th>ID</th><th>User ID</th><th>Type</th><th>Start Date</th><th>End Date</th><th>Status</th><th>Actions</th>
+      </tr></thead><tbody>`;
+
+      memberships.forEach(membership => {
+          html += `<tr>
+              <td>${membership.id}</td>
+              <td>${membership.userId}</td>
+              <td><strong>${membership.membershipType}</strong></td>
+              <td>${new Date(membership.startDate).toLocaleDateString()}</td>
+              <td>${new Date(membership.endDate).toLocaleDateString()}</td>
+              <td><span class="status-badge status-${membership.status.toLowerCase()}">${membership.status}</span></td>
+              <td><div class="action-buttons">
+                  <button class="btn-delete" onclick="deleteMembership(${membership.id})">Delete</button>
+              </div></td>
+          </tr>`;
+      });
+
+      html += `</tbody></table>`;
+      document.getElementById('membershipsTable').innerHTML = html;
+  }
+
+  async function deleteMembership(membershipId) {
+      if (confirm('Are you sure you want to delete this membership?')) {
+          try {
+              const response = await fetch(`${API_URL}/api/membership/${membershipId}`, {
+                  method: 'DELETE',
+                  headers: { 'Authorization': `Bearer ${token}` }
+              });
+
+              if (response.ok) {
+                  showSuccess('Membership deleted successfully');
+                  loadMemberships();
+              } else {
+                  showError('Failed to delete membership');
+              }
+          } catch (error) {
+              showError('Error: ' + error.message);
+          }
+      }
+  }
+
+  // ======================== EVENTS ========================
+
+  function showEventModal() {
+      document.getElementById('eventForm').reset();
+      document.getElementById('eventModalTitle').textContent = 'Add Event';
+      document.getElementById('eventModal').classList.add('active');
+  }
+
+  function closeEventModal() {
+      document.getElementById('eventModal').classList.remove('active');
+  }
+
+  document.getElementById('eventForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const eventData = {
+          title: document.getElementById('eventTitle').value,
+          description: document.getElementById('eventDescription').value,
+          eventDate: document.getElementById('eventDate').value,
+          type: document.getElementById('eventType').value,
+          status: document.getElementById('eventStatus').value,
+          userId: parseInt(document.getElementById('eventUserId').value) || null
+      };
+
+      try {
+          const response = await fetch(`${API_URL}/api/events`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(eventData)
+          });
+
+          if (response.ok) {
+              showSuccess('Event created successfully');
+              closeEventModal();
+              loadEvents();
+          } else {
+              showError('Failed to create event');
+          }
+      } catch (error) {
+          showError('Error: ' + error.message);
+      }
+  });
+
+  async function loadEvents() {
+      try {
+          const response = await fetch(`${API_URL}/api/events`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          if (response.ok) {
+              const data = await response.json();
+              displayEvents(data.data || data);
+          } else {
+              showError('Failed to load events');
+          }
+      } catch (error) {
+          showError('Error: ' + error.message);
+      }
+  }
+
+  function displayEvents(events) {
+      if (!events || events.length === 0) {
+          document.getElementById('eventsTable').innerHTML = '<div class="no-data">No events found</div>';
+          return;
+      }
+
+      let html = `<table><thead><tr>
+          <th>ID</th><th>Title</th><th>Type</th><th>Date</th><th>Status</th><th>Actions</th>
+      </tr></thead><tbody>`;
+
+      events.forEach(event => {
+          html += `<tr>
+              <td>${event.id}</td>
+              <td>${event.title}</td>
+              <td>${event.type}</td>
+              <td>${new Date(event.eventDate).toLocaleDateString()}</td>
+              <td><span class="status-badge status-${event.status.toLowerCase()}">${event.status}</span></td>
+              <td><div class="action-buttons">
+                  <button class="btn-delete" onclick="deleteEvent(${event.id})">Delete</button>
+              </div></td>
+          </tr>`;
+      });
+
+      html += `</tbody></table>`;
+      document.getElementById('eventsTable').innerHTML = html;
+  }
+
+  async function deleteEvent(eventId) {
+      if (confirm('Are you sure you want to delete this event?')) {
+          try {
+              const response = await fetch(`${API_URL}/api/events/${eventId}`, {
+                  method: 'DELETE',
+                  headers: { 'Authorization': `Bearer ${token}` }
+              });
+
+              if (response.ok) {
+                  showSuccess('Event deleted successfully');
+                  loadEvents();
+              } else {
+                  showError('Failed to delete event');
+              }
+          } catch (error) {
+              showError('Error: ' + error.message);
+          }
+      }
+  }
+
+  // ======================== MAINTENANCE ========================
+
+  function switchMaintenanceTab(tab) {
+      document.getElementById('accessLogsTab').style.display = tab === 'access-logs' ? 'block' : 'none';
+      document.getElementById('reportsTab').style.display = tab === 'reports' ? 'block' : 'none';
+      document.getElementById('transactionsTab').style.display = tab === 'transactions' ? 'block' : 'none';
+  }
+
+  async function loadAccessLogs() {
+      try {
+          const response = await fetch(`${API_URL}/api/maintenance/access`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          if (response.ok) {
+              const data = await response.json();
+              displayAccessLogs(data.data || data);
+          }
+      } catch (error) {
+          console.error('Error loading access logs:', error);
+      }
+  }
+
+  function displayAccessLogs(logs) {
+      if (!logs || logs.length === 0) {
+          document.getElementById('accessLogsTable').innerHTML = '<div class="no-data">No access logs found</div>';
+          return;
+      }
+
+      let html = `<table><thead><tr>
+          <th>ID</th><th>User</th><th>Action</th><th>Timestamp</th><th>IP Address</th>
+      </tr></thead><tbody>`;
+
+      logs.forEach(log => {
+          html += `<tr>
+              <td>${log.id}</td>
+              <td>${log.username || 'N/A'}</td>
+              <td>${log.action}</td>
+              <td>${log.accessTime}</td>
+              <td>${log.ipAddress}</td>
+          </tr>`;
+      });
+
+      html += `</tbody></table>`;
+      document.getElementById('accessLogsTable').innerHTML = html;
+  }
+
+  function showReportModal() {
+      document.getElementById('reportForm').reset();
+      document.getElementById('reportModal').classList.add('active');
+  }
+
+  function closeReportModal() {
+      document.getElementById('reportModal').classList.remove('active');
+  }
+
+  document.getElementById('reportForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const reportData = {
+          title: document.getElementById('reportTitle').value,
+          description: document.getElementById('reportDescription').value,
+          reportDate: document.getElementById('reportDate').value
+      };
+
+      try {
+          const response = await fetch(`${API_URL}/api/maintenance/reports`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(reportData)
+          });
+
+          if (response.ok) {
+              showSuccess('Report generated successfully');
+              closeReportModal();
+              loadReports();
+          } else {
+              showError('Failed to generate report');
+          }
+      } catch (error) {
+          showError('Error: ' + error.message);
+      }
+  });
+
+  async function loadReports() {
+      try {
+          const response = await fetch(`${API_URL}/api/maintenance/reports`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          if (response.ok) {
+              const data = await response.json();
+              displayReports(data.data || data);
+          }
+      } catch (error) {
+          console.error('Error loading reports:', error);
+      }
+  }
+
+  function displayReports(reports) {
+      if (!reports || reports.length === 0) {
+          document.getElementById('reportsTable').innerHTML = '<div class="no-data">No reports found</div>';
+          return;
+      }
+
+      let html = `<table><thead><tr>
+          <th>ID</th><th>Title</th><th>Description</th><th>Date</th>
+      </tr></thead><tbody>`;
+
+      reports.forEach(report => {
+          html += `<tr>
+              <td>${report.id}</td>
+              <td><strong>${report.title}</strong></td>
+              <td>${report.description}</td>
+              <td>${new Date(report.reportDate).toLocaleDateString()}</td>
+          </tr>`;
+      });
+
+      html += `</tbody></table>`;
+      document.getElementById('reportsTable').innerHTML = html;
+  }
+
+  function showTransactionModal() {
+      document.getElementById('transactionForm').reset();
+      document.getElementById('transactionModal').classList.add('active');
+  }
+
+  function closeTransactionModal() {
+      document.getElementById('transactionModal').classList.remove('active');
+  }
+
+  document.getElementById('transactionForm')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const transactionData = {
+          amount: parseFloat(document.getElementById('transactionAmount').value),
+          type: document.getElementById('transactionType').value,
+          description: document.getElementById('transactionDescription').value,
+          userId: document.getElementById('transactionId').value
+      };
+
+      try {
+          const response = await fetch(`${API_URL}/api/maintenance/transactions`, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(transactionData)
+          });
+
+          if (response.ok) {
+              showSuccess('Transaction recorded successfully');
+              closeTransactionModal();
+              loadTransactions();
+          } else {
+              showError('Failed to record transaction');
+          }
+      } catch (error) {
+          showError('Error: ' + error.message);
+      }
+  });
+
+  async function loadTransactions() {
+      try {
+          const response = await fetch(`${API_URL}/api/maintenance/transactions`, {
+              headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          if (response.ok) {
+              const data = await response.json();
+              displayTransactions(data.data || data);
+          }
+      } catch (error) {
+          console.error('Error loading transactions:', error);
+      }
+  }
+
+  function displayTransactions(transactions) {
+      if (!transactions || transactions.length === 0) {
+          document.getElementById('transactionsTable').innerHTML = '<div class="no-data">No transactions found</div>';
+          return;
+      }
+
+      let html = `<table><thead><tr>
+          <th>ID</th><th>Amount</th><th>Type</th><th>Description</th><th>Status</th>
+      </tr></thead><tbody>`;
+
+      transactions.forEach(transaction => {
+          html += `<tr>
+              <td>${transaction.id}</td>
+              <td>$${transaction.amount.toFixed(2)}</td>
+              <td><strong>${transaction.type}</strong></td>
+              <td>${transaction.description}</td>
+              <td><span class="status-badge status-completed">${transaction.status}</span></td>
+          </tr>`;
+      });
+
+      html += `</tbody></table>`;
+      document.getElementById('transactionsTable').innerHTML = html;
+  }
+
+  // ======================== UTILITY FUNCTIONS ========================
+
+  function loadAllData() {
+      if (currentRole === 'ADMIN' || currentRole === 'ROLE_ADMIN') {
+          loadUsers();
+      }
+      loadMemberships();
+      loadEvents();
+      loadAccessLogs();
+      loadReports();
+      loadTransactions();
+  }
+
+  function showSuccess(message) {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-success';
+      alertDiv.textContent = message;
+      document.body.insertBefore(alertDiv, document.body.firstChild);
+      setTimeout(() => alertDiv.remove(), 3000);
+  }
+
+  function showError(message, elementId = null) {
+      if (elementId) {
+          const errorEl = document.getElementById(elementId);
+          if (errorEl) {
+              errorEl.textContent = message;
+              errorEl.style.display = 'block';
+              return;
+          }
+      }
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-error';
+      alertDiv.textContent = message;
+      document.body.insertBefore(alertDiv, document.body.firstChild);
+      setTimeout(() => alertDiv.remove(), 3000);
+  }
+</script>
+</body>
+</html>
